@@ -1,0 +1,361 @@
+/* ── Google Fonts ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── Root variables ───────────────────────────────────────────────── */
+:root {
+    --bg-primary:    #0a0a0f;
+    --bg-card:       #12121a;
+    --bg-card2:      #1a1a26;
+    --bg-card3:      #0f0f18;
+    --gold:          #c9a96e;
+    --gold2:         #e8c98a;
+    --gold-glow:     rgba(201,169,110,0.15);
+    --platinum:      #8892a4;
+    --silver:        #c8d0de;
+    --success:       #4ade80;
+    --warning:       #fbbf24;
+    --danger:        #f87171;
+    --text-primary:  #f0f2f6;
+    --text-muted:    #6b7589;
+    --border:        rgba(201,169,110,0.12);
+    --border2:       rgba(255,255,255,0.06);
+    --radius:        16px;
+    --radius-sm:     10px;
+}
+
+/* ── Global ───────────────────────────────────────────────────────── */
+.stApp {
+    background: var(--bg-primary) !important;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+}
+#MainMenu, footer, header { visibility: hidden; }
+.block-container { padding: 0 2.5rem 4rem !important; max-width: 1320px !important; }
+
+/* ── Header ───────────────────────────────────────────────────────── */
+.main-header {
+    text-align: center;
+    padding: 3.5rem 1rem 2.5rem;
+    position: relative;
+}
+.main-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse at center, rgba(201,169,110,0.06) 0%, transparent 70%);
+    pointer-events: none;
+}
+.header-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(201,169,110,0.08);
+    border: 1px solid rgba(201,169,110,0.2);
+    color: var(--gold);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.35rem 1rem;
+    border-radius: 100px;
+    margin-bottom: 1.2rem;
+}
+.header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+.header-title .gold-text {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.header-divider {
+    width: 60px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 1rem auto;
+}
+.header-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────── */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.8rem;
+    margin-bottom: 1.2rem;
+    position: relative;
+    overflow: hidden;
+}
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,169,110,0.3), transparent);
+}
+.card-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+/* ── Before/After comparison ──────────────────────────────────────── */
+.comparison-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+.compare-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+.compare-header {
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border2);
+}
+.compare-header.before { background: rgba(248,113,113,0.06); }
+.compare-header.after  { background: rgba(74,222,128,0.06); }
+.compare-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+.compare-label.before { color: var(--danger); }
+.compare-label.after  { color: var(--success); }
+.compare-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+.compare-body {
+    padding: 1.2rem 1.5rem;
+    max-height: 420px;
+    overflow-y: auto;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: var(--silver);
+    white-space: pre-wrap;
+}
+.compare-body::-webkit-scrollbar { width: 4px; }
+.compare-body::-webkit-scrollbar-track { background: transparent; }
+.compare-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── Delta metric ─────────────────────────────────────────────────── */
+.delta-strip {
+    display: flex;
+    gap: 1rem;
+    margin: 1.2rem 0;
+    flex-wrap: wrap;
+}
+.delta-card {
+    flex: 1;
+    min-width: 140px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.2rem;
+    position: relative;
+    overflow: hidden;
+}
+.delta-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+}
+.delta-card.positive::after { background: var(--success); }
+.delta-card.negative::after { background: var(--danger); }
+.delta-card.neutral::after  { background: var(--gold); }
+.delta-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+.delta-values {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+.delta-old { font-size: 1rem; color: var(--danger); font-weight: 500; text-decoration: line-through; opacity: 0.7; }
+.delta-arrow { color: var(--text-muted); font-size: 0.8rem; }
+.delta-new { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; }
+.delta-new.positive { color: var(--success); }
+.delta-new.neutral  { color: var(--gold); }
+.delta-change {
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-top: 0.15rem;
+}
+.delta-change.positive { color: var(--success); }
+.delta-change.negative { color: var(--danger); }
+
+/* ── Score ring ───────────────────────────────────────────────────── */
+.score-ring-container {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 1rem 0;
+}
+.score-ring { position: relative; width: 170px; height: 170px; }
+.score-ring svg { transform: rotate(-90deg); }
+.score-value {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+}
+.score-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem; font-weight: 700; line-height: 1;
+}
+.score-label {
+    font-size: 0.6rem; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted); margin-top: 0.25rem;
+}
+.score-grade {
+    font-size: 0.78rem; font-weight: 700;
+    margin-top: 0.9rem; padding: 0.3rem 1.1rem;
+    border-radius: 100px; letter-spacing: 0.1em;
+    border: 1.5px solid currentColor;
+    text-transform: uppercase;
+}
+
+/* ── Skill tags ───────────────────────────────────────────────────── */
+.skill-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.6rem; }
+.skill-tag {
+    padding: 0.28rem 0.8rem; border-radius: 100px;
+    font-size: 0.74rem; font-weight: 500; letter-spacing: 0.02em;
+}
+.skill-tag.matched  { background: rgba(74,222,128,0.1);  color: var(--success); border: 1px solid rgba(74,222,128,0.25); }
+.skill-tag.missing  { background: rgba(248,113,113,0.1); color: var(--danger);  border: 1px solid rgba(248,113,113,0.25); }
+.skill-tag.suggested{ background: rgba(251,191,36,0.1);  color: var(--warning); border: 1px solid rgba(251,191,36,0.25); }
+.skill-tag.keyword  { background: rgba(201,169,110,0.1); color: var(--gold);    border: 1px solid rgba(201,169,110,0.25); }
+
+/* ── Stat grid ────────────────────────────────────────────────────── */
+.stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin: 1.2rem 0; }
+.stat-box {
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1.1rem 1rem; text-align: center;
+    position: relative; overflow: hidden;
+}
+.stat-box::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.stat-box .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-weight: 700; line-height: 1;
+}
+.stat-box .stat-desc {
+    font-size: 0.62rem; color: var(--text-muted);
+    margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.1em;
+}
+
+/* ── Progress bars ────────────────────────────────────────────────── */
+.progress-item { margin-bottom: 1rem; }
+.progress-header {
+    display: flex; justify-content: space-between;
+    font-size: 0.78rem; margin-bottom: 0.4rem; color: var(--silver);
+}
+.progress-bar-bg { height: 5px; background: rgba(255,255,255,0.05); border-radius: 100px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 100px; }
+
+/* ── Improvements ─────────────────────────────────────────────────── */
+.improvement-item {
+    display: flex; gap: 1rem; padding: 1rem 1.1rem;
+    background: var(--bg-card2); border-radius: var(--radius-sm);
+    margin-bottom: 0.7rem; border-left: 2px solid;
+}
+.improvement-item.high   { border-color: var(--danger); }
+.improvement-item.medium { border-color: var(--warning); }
+.improvement-item.low    { border-color: var(--success); }
+.improvement-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
+.improvement-text { font-size: 0.82rem; line-height: 1.55; }
+.improvement-text strong { color: var(--text-primary); font-weight: 600; }
+.improvement-text span   { color: var(--text-muted); }
+
+/* ── Steps (sidebar) ──────────────────────────────────────────────── */
+.step-list { }
+.step-item {
+    display: flex; align-items: flex-start; gap: 0.9rem;
+    padding: 0.7rem 0; border-bottom: 1px solid var(--border2);
+}
+.step-item:last-child { border-bottom: none; }
+.step-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: #0a0a0f; font-size: 0.7rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-text { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; padding-top: 0.15rem; }
+
+/* ── Streamlit overrides ──────────────────────────────────────────── */
+div[data-testid="stTabs"] button[data-baseweb="tab"] {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600 !important; font-size: 0.8rem !important;
+    letter-spacing: 0.06em !important; text-transform: uppercase !important;
+}
+.stButton > button {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%) !important;
+    color: #0a0a0f !important; border: none !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important; font-size: 0.82rem !important;
+    letter-spacing: 0.08em !important; text-transform: uppercase !important;
+    padding: 0.7rem 2rem !important; border-radius: 8px !important;
+}
+.stButton > button:hover { opacity: 0.88 !important; }
+.stTextArea textarea {
+    background: var(--bg-card2) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-sm) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.85rem !important;
+}
+div[data-testid="stSidebar"] {
+    background: var(--bg-card3) !important;
+    border-right: 1px solid var(--border) !important;
+}
+div[data-testid="stSelectbox"] > div > div {
+    background: var(--bg-card2) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-primary) !important;
+}

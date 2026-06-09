@@ -1,0 +1,14 @@
+[theme]
+base                     = "dark"
+backgroundColor          = "#0a0a0f"
+secondaryBackgroundColor = "#12121a"
+textColor                = "#f0f2f6"
+primaryColor             = "#c9a96e"
+font                     = "sans serif"
+
+[server]
+headless = true
+port     = 8501
+
+[ui]
+hideSidebarNav = false
