@@ -5,121 +5,185 @@ Download as PDF or DOCX.
 """
 import streamlit as st
 import re
-from utils.export import text_to_pdf_bytes, text_to_docx_bytes, resume_to_txt_bytes
+from utils.export import text_to_pdf_bytes, text_to_docx_bytes, resume_to_txt_bytes, clean_and_check_header, is_bullet, clean_bullet_text, strip_markdown
 from utils.ai_engine import optimize_resume
 
 # ── Template definitions ──────────────────────────────────────────────────────
 TEMPLATES = {
     "Classic Professional": {
-        "desc": "Clean serif font, navy accents — ideal for finance, law, consulting",
+        "desc": "Clean serif Georgia font, navy accents — classic business layout",
         "icon": "🏛️",
         "css": """
-            body{font-family:'Georgia',serif;color:#1a1a2e;background:#fff;margin:0;padding:0}
-            .resume{max-width:760px;margin:0 auto;padding:48px 52px;background:#fff}
-            .name{font-size:26px;font-weight:700;color:#0d1b4b;letter-spacing:0.5px;margin-bottom:3px}
-            .contact{font-size:11px;color:#4a5568;margin-bottom:18px;line-height:1.8}
-            .section-title{font-size:11px;font-weight:700;text-transform:uppercase;
-                letter-spacing:2px;color:#0d1b4b;border-bottom:1.5px solid #0d1b4b;
-                padding-bottom:3px;margin:20px 0 10px}
-            .job-header{font-size:12.5px;font-weight:700;color:#1a1a2e;margin-bottom:1px}
-            .job-meta{font-size:11px;color:#4a5568;margin-bottom:6px}
-            .bullet{font-size:11.5px;line-height:1.65;color:#2d3748;margin:2px 0 2px 16px;
+            body{font-family:'Georgia',serif;color:#1e293b;background:#fff;margin:0;padding:0}
+            .resume{max-width:760px;margin:0 auto;padding:25px 35px;background:#fff}
+            .name{font-size:22px;font-weight:700;color:#0d1b4b;letter-spacing:0.5px;margin-bottom:3px}
+            .contact{font-size:10px;color:#475569;margin-bottom:12px;line-height:1.5}
+            .section-title{font-size:10.5px;font-weight:700;text-transform:uppercase;
+                letter-spacing:1.5px;color:#0d1b4b;border-bottom:1px solid #0d1b4b;
+                padding-bottom:2px;margin:12px 0 6px}
+            .job-header{font-size:11.5px;font-weight:700;color:#1e293b;margin-bottom:1px}
+            .job-meta{font-size:10px;color:#475569;margin-bottom:4px}
+            .bullet{font-size:10px;line-height:1.4;color:#334155;margin:2px 0 2px 14px;
                 text-indent:-10px;padding-left:10px}
             .bullet::before{content:"•";color:#0d1b4b;margin-right:6px}
-            .body-text{font-size:11.5px;line-height:1.7;color:#2d3748}
-            .skill-group{font-size:11.5px;color:#2d3748;margin:3px 0;line-height:1.6}
+            .body-text{font-size:10px;line-height:1.45;color:#334155}
+            .skill-group{font-size:10px;color:#334155;margin:2px 0;line-height:1.4}
         """,
     },
     "Modern Minimal": {
-        "desc": "Clean sans-serif, sidebar accent line — great for tech, startups",
+        "desc": "Clean sans-serif Arial, sidebar accent line — modern tech layout",
         "icon": "⚡",
         "css": """
-            body{font-family:'Arial',sans-serif;color:#111;background:#fff;margin:0;padding:0}
-            .resume{max-width:760px;margin:0 auto;padding:44px 52px;background:#fff;
-                border-left:4px solid #2563eb}
-            .name{font-size:28px;font-weight:700;color:#1e3a8a;letter-spacing:-0.5px;margin-bottom:2px}
-            .contact{font-size:11px;color:#6b7280;margin-bottom:20px;line-height:1.9}
-            .section-title{font-size:10px;font-weight:700;text-transform:uppercase;
-                letter-spacing:2.5px;color:#2563eb;margin:22px 0 8px;
-                padding-left:8px;border-left:3px solid #2563eb}
-            .job-header{font-size:13px;font-weight:700;color:#111;margin-bottom:1px}
-            .job-meta{font-size:11px;color:#6b7280;margin-bottom:6px}
-            .bullet{font-size:11.5px;line-height:1.65;color:#374151;margin:2px 0 2px 14px;
+            body{font-family:'Arial',sans-serif;color:#1e293b;background:#fff;margin:0;padding:0}
+            .resume{max-width:760px;margin:0 auto;padding:25px 35px;background:#fff;
+                border-left:3px solid #2563eb}
+            .name{font-size:24px;font-weight:700;color:#1e3a8a;letter-spacing:-0.5px;margin-bottom:2px}
+            .contact{font-size:9.5px;color:#64748b;margin-bottom:12px;line-height:1.5}
+            .section-title{font-size:9.5px;font-weight:700;text-transform:uppercase;
+                letter-spacing:2px;color:#2563eb;margin:12px 0 6px;
+                padding-left:6px;border-left:2px solid #2563eb}
+            .job-header{font-size:11.5px;font-weight:700;color:#0f172a;margin-bottom:1px}
+            .job-meta{font-size:9.5px;color:#64748b;margin-bottom:4px}
+            .bullet{font-size:10px;line-height:1.4;color:#334155;margin:2px 0 2px 12px;
                 text-indent:-8px;padding-left:8px}
-            .bullet::before{content:"▸";color:#2563eb;margin-right:5px;font-size:10px}
-            .body-text{font-size:11.5px;line-height:1.7;color:#374151}
-            .skill-group{font-size:11.5px;color:#374151;margin:3px 0;line-height:1.6}
+            .bullet::before{content:"▸";color:#2563eb;margin-right:5px;font-size:9px}
+            .body-text{font-size:10px;line-height:1.45;color:#334155}
+            .skill-group{font-size:10px;color:#334155;margin:2px 0;line-height:1.4}
         """,
     },
     "Executive Elite": {
-        "desc": "Two-tone header, gold rule — perfect for senior roles and executives",
+        "desc": "Compact top header block, gold rule dividers — premium executive style",
         "icon": "👑",
         "css": """
-            body{font-family:'Georgia',serif;color:#1a1a2e;background:#fff;margin:0;padding:0}
+            body{font-family:'Georgia',serif;color:#1e293b;background:#fff;margin:0;padding:0}
             .resume{max-width:760px;margin:0 auto;padding:0;background:#fff}
-            .header-block{background:#1a1a2e;padding:32px 52px 24px;margin-bottom:0}
-            .name{font-size:28px;font-weight:700;color:#fff;letter-spacing:1px;margin-bottom:3px}
-            .contact{font-size:11px;color:#c9a96e;line-height:2}
-            .gold-rule{height:3px;background:linear-gradient(90deg,#c9a96e,#e8c98a,#c9a96e);margin:0}
-            .body-section{padding:24px 52px}
-            .section-title{font-size:10px;font-weight:700;text-transform:uppercase;
-                letter-spacing:2px;color:#c9a96e;border-bottom:1px solid #c9a96e33;
-                padding-bottom:4px;margin:18px 0 10px}
-            .job-header{font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:1px}
-            .job-meta{font-size:11px;color:#6b5f4e;margin-bottom:6px}
-            .bullet{font-size:11.5px;line-height:1.65;color:#2d3748;margin:2px 0 2px 16px;
+            .header-block{background:#1e293b;padding:20px 35px 15px;margin-bottom:0}
+            .name{font-size:24px;font-weight:700;color:#fff;letter-spacing:0.5px;margin-bottom:2px}
+            .contact{font-size:10px;color:#c9a96e;line-height:1.6}
+            .gold-rule{height:2px;background:linear-gradient(90deg,#c9a96e,#e8c98a,#c9a96e);margin:0}
+            .body-section{padding:15px 35px}
+            .section-title{font-size:9.5px;font-weight:700;text-transform:uppercase;
+                letter-spacing:1.5px;color:#c9a96e;border-bottom:1px solid #c9a96e44;
+                padding-bottom:2px;margin:12px 0 6px}
+            .job-header{font-size:11.5px;font-weight:700;color:#1e293b;margin-bottom:1px}
+            .job-meta{font-size:9.5px;color:#6b5f4e;margin-bottom:4px}
+            .bullet{font-size:10px;line-height:1.4;color:#334155;margin:2px 0 2px 14px;
                 text-indent:-10px;padding-left:10px}
-            .bullet::before{content:"◆";color:#c9a96e;margin-right:6px;font-size:8px}
-            .body-text{font-size:11.5px;line-height:1.7;color:#2d3748}
-            .skill-group{font-size:11.5px;color:#2d3748;margin:3px 0;line-height:1.6}
+            .bullet::before{content:"◆";color:#c9a96e;margin-right:6px;font-size:7px}
+            .body-text{font-size:10px;line-height:1.45;color:#334155}
+            .skill-group{font-size:10px;color:#334155;margin:2px 0;line-height:1.4}
         """,
     },
     "Tech Focused": {
-        "desc": "Monospace accents, green highlights — tailored for software engineers",
+        "desc": "Monospace elements, green accents — ideal for tech and developers",
         "icon": "💻",
         "css": """
             body{font-family:'Arial',sans-serif;color:#0f172a;background:#fff;margin:0;padding:0}
-            .resume{max-width:760px;margin:0 auto;padding:40px 52px;background:#fff}
-            .name{font-size:24px;font-weight:700;color:#0f172a;font-family:'Courier New',monospace;margin-bottom:2px}
+            .resume{max-width:760px;margin:0 auto;padding:25px 35px;background:#fff}
+            .name{font-size:22px;font-weight:700;color:#0f172a;font-family:'Courier New',monospace;margin-bottom:2px}
             .name-accent{color:#059669}
-            .contact{font-size:11px;color:#64748b;font-family:'Courier New',monospace;margin-bottom:18px;line-height:1.9}
-            .section-title{font-size:11px;font-weight:700;text-transform:uppercase;
-                letter-spacing:1.5px;color:#059669;margin:20px 0 8px;
+            .contact{font-size:9.5px;color:#64748b;font-family:'Courier New',monospace;margin-bottom:12px;line-height:1.6}
+            .section-title{font-size:9.5px;font-weight:700;text-transform:uppercase;
+                letter-spacing:1.5px;color:#059669;margin:12px 0 6px;
                 font-family:'Courier New',monospace}
-            .section-rule{height:1px;background:#d1fae5;margin-bottom:10px}
-            .job-header{font-size:13px;font-weight:700;color:#0f172a;margin-bottom:1px}
-            .job-meta{font-size:11px;color:#64748b;margin-bottom:6px;font-family:'Courier New',monospace}
-            .bullet{font-size:11.5px;line-height:1.65;color:#1e293b;margin:2px 0 2px 14px;
+            .section-rule{height:1px;background:#d1fae5;margin-bottom:6px}
+            .job-header{font-size:11.5px;font-weight:700;color:#0f172a;margin-bottom:1px}
+            .job-meta{font-size:9.5px;color:#64748b;margin-bottom:4px;font-family:'Courier New',monospace}
+            .bullet{font-size:10px;line-height:1.4;color:#1e293b;margin:2px 0 2px 12px;
                 text-indent:-8px;padding-left:8px}
             .bullet::before{content:"→";color:#059669;margin-right:5px}
-            .body-text{font-size:11.5px;line-height:1.7;color:#1e293b}
-            .skill-group{font-size:11.5px;color:#1e293b;margin:3px 0;line-height:1.6}
-            .skill-tag-inline{background:#d1fae5;color:#065f46;padding:1px 7px;
-                border-radius:3px;font-size:10.5px;margin:2px;display:inline-block}
+            .body-text{font-size:10px;line-height:1.45;color:#1e293b}
+            .skill-group{font-size:10px;color:#1e293b;margin:2px 0;line-height:1.4}
+            .skill-tag-inline{background:#d1fae5;color:#065f46;padding:1px 5px;
+                border-radius:3px;font-size:9.5px;margin:1px;display:inline-block}
         """,
     },
     "Creative Clean": {
-        "desc": "Purple accents, modern layout — for design, marketing, creative roles",
+        "desc": "Purple highlights, gradient header borders — clean creative layout",
         "icon": "🎨",
         "css": """
             body{font-family:'Arial',sans-serif;color:#1f1f2e;background:#fff;margin:0;padding:0}
-            .resume{max-width:760px;margin:0 auto;padding:44px 52px;background:#fff}
-            .name{font-size:27px;font-weight:700;color:#4c1d95;letter-spacing:-0.3px;margin-bottom:2px}
-            .contact{font-size:11px;color:#6b7280;margin-bottom:18px;line-height:1.9}
-            .section-title{font-size:10.5px;font-weight:700;text-transform:uppercase;
-                letter-spacing:2px;color:#7c3aed;margin:20px 0 8px;
+            .resume{max-width:760px;margin:0 auto;padding:25px 35px;background:#fff}
+            .name{font-size:24px;font-weight:700;color:#4c1d95;letter-spacing:-0.3px;margin-bottom:2px}
+            .contact{font-size:9.5px;color:#6b7280;margin-bottom:12px;line-height:1.6}
+            .section-title{font-size:9.5px;font-weight:700;text-transform:uppercase;
+                letter-spacing:1.5px;color:#7c3aed;margin:12px 0 6px;
                 background:linear-gradient(90deg,#ede9fe,transparent);
-                padding:4px 8px;border-radius:3px}
-            .job-header{font-size:13px;font-weight:700;color:#1f1f2e;margin-bottom:1px}
-            .job-meta{font-size:11px;color:#6b7280;margin-bottom:6px}
-            .bullet{font-size:11.5px;line-height:1.65;color:#374151;margin:2px 0 2px 14px;
+                padding:2px 6px;border-radius:2px}
+            .job-header{font-size:11.5px;font-weight:700;color:#1f1f2e;margin-bottom:1px}
+            .job-meta{font-size:9.5px;color:#6b7280;margin-bottom:4px}
+            .bullet{font-size:10px;line-height:1.4;color:#374151;margin:2px 0 2px 12px;
                 text-indent:-8px;padding-left:8px}
-            .bullet::before{content:"◉";color:#7c3aed;margin-right:5px;font-size:9px}
-            .body-text{font-size:11.5px;line-height:1.7;color:#374151}
-            .skill-group{font-size:11.5px;color:#374151;margin:3px 0;line-height:1.6}
+            .bullet::before{content:"◉";color:#7c3aed;margin-right:5px;font-size:8px}
+            .body-text{font-size:10px;line-height:1.45;color:#374151}
+            .skill-group{font-size:10px;color:#374151;margin:2px 0;line-height:1.4}
         """,
     },
+    "Sleek Harvard": {
+        "desc": "Academic Times New Roman, centered header — traditional elite formatting",
+        "icon": "🎓",
+        "css": """
+            body{font-family:'Times New Roman',Times,serif;color:#111111;background:#fff;margin:0;padding:0}
+            .resume{max-width:760px;margin:0 auto;padding:25px 35px;background:#fff}
+            .name{font-size:22px;font-weight:700;text-align:center;color:#000;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+            .contact{font-size:9.5px;text-align:center;color:#333;margin-bottom:12px;line-height:1.5}
+            .section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#000;border-bottom:1px solid #000;padding-bottom:2px;margin:12px 0 6px}
+            .job-header{font-size:11px;font-weight:700;color:#111;margin-bottom:1px}
+            .job-meta{font-size:9.5px;color:#333;margin-bottom:4px}
+            .bullet{font-size:10px;line-height:1.4;color:#222;margin:2px 0 2px 14px;text-indent:-10px;padding-left:10px}
+            .bullet::before{content:"•";color:#000;margin-right:6px}
+            .body-text{font-size:10px;line-height:1.45;color:#222}
+            .skill-group{font-size:10px;color:#222;margin:2px 0;line-height:1.4}
+        """,
+    },
+    "Silicon Valley": {
+        "desc": "Clean sans-serif, sky blue details — high density tech layout",
+        "icon": "🌐",
+        "css": """
+            body{font-family:'Arial',sans-serif;color:#1e293b;background:#fff;margin:0;padding:0}
+            .resume{max-width:760px;margin:0 auto;padding:25px 35px;background:#fff}
+            .name{font-size:24px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;margin-bottom:2px}
+            .contact{font-size:9.5px;color:#64748b;margin-bottom:12px;line-height:1.5}
+            .section-title{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#0284c7;border-bottom:1px solid #e2e8f0;padding-bottom:2px;margin:12px 0 6px}
+            .job-header{font-size:11.5px;font-weight:700;color:#0f172a;margin-bottom:1px}
+            .job-meta{font-size:9.5px;color:#64748b;margin-bottom:4px}
+            .bullet{font-size:10px;line-height:1.4;color:#334155;margin:2px 0 2px 12px;text-indent:-8px;padding-left:8px}
+            .bullet::before{content:"▪";color:#0284c7;margin-right:5px;font-size:7px}
+            .body-text{font-size:10px;line-height:1.45;color:#334155}
+            .skill-group{font-size:10px;color:#334155;margin:2px 0;line-height:1.4}
+        """,
+    },
+    "Corporate Executive": {
+        "desc": "Premium Georgia, slate accents — elegant business single-page format",
+        "icon": "💼",
+        "css": """
+            body{font-family:'Georgia',serif;color:#222;background:#fff;margin:0;padding:0}
+            .resume{max-width:760px;margin:0 auto;padding:25px 35px;background:#fff}
+            .name{font-size:22px;font-weight:700;color:#1e293b;letter-spacing:0.5px;margin-bottom:2px}
+            .contact{font-size:9.5px;color:#475569;margin-bottom:12px;line-height:1.5}
+            .section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#1e293b;border-bottom:1.5px solid #475569;padding-bottom:2px;margin:12px 0 6px}
+            .job-header{font-size:11.5px;font-weight:700;color:#1e293b;margin-bottom:1px}
+            .job-meta{font-size:9.5px;color:#475569;margin-bottom:4px}
+            .bullet{font-size:10px;line-height:1.4;color:#334155;margin:2px 0 2px 14px;text-indent:-10px;padding-left:10px}
+            .bullet::before{content:"•";color:#1e293b;margin-right:6px}
+            .body-text{font-size:10px;line-height:1.45;color:#334155}
+            .skill-group{font-size:10px;color:#334155;margin:2px 0;line-height:1.4}
+        """,
+    },
+},
 }
+
+
+def md_to_html(text: str) -> str:
+    # Replace **text** with <strong>text</strong>
+    text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", text)
+    # Replace *text* with <em>text</em>
+    text = re.sub(r"\*(.*?)\*", r"<em>\1</em>", text)
+    # Replace __text__ with <strong>text</strong>
+    text = re.sub(r"__(.*?)__", r"<strong>\1</strong>", text)
+    # Replace _text_ with <em>text</em>
+    text = re.sub(r"_(.*?)_", r"<em>\1</em>", text)
+    return text
 
 
 def _parse_resume_to_html(text: str, template_name: str) -> str:
@@ -130,7 +194,7 @@ def _parse_resume_to_html(text: str, template_name: str) -> str:
     is_executive = template_name == "Executive Elite"
     is_tech      = template_name == "Tech Focused"
 
-    body_html = ""
+    sections_html = ""
     in_header_block = True
     name_done = False
     contact_lines = []
@@ -138,12 +202,12 @@ def _parse_resume_to_html(text: str, template_name: str) -> str:
     def flush_contacts():
         nonlocal contact_lines
         if contact_lines:
-            html = '<div class="contact">' + " &nbsp;|&nbsp; ".join(contact_lines) + '</div>'
+            cleaned_contacts = [md_to_html(strip_markdown(l)) for l in contact_lines]
+            html = '<div class="contact">' + " &nbsp;|&nbsp; ".join(cleaned_contacts) + '</div>'
             contact_lines = []
             return html
         return ""
 
-    sections_html = ""
     current_section = None
 
     for line in lines:
@@ -151,26 +215,29 @@ def _parse_resume_to_html(text: str, template_name: str) -> str:
         if not stripped:
             continue
 
-        # ALL-CAPS section header
-        if re.match(r"^[A-Z][A-Z\s\/&]{3,}$", stripped) and len(stripped) < 50:
+        # Check for section header
+        is_hdr, hdr_title = clean_and_check_header(stripped)
+        if is_hdr:
             in_header_block = False
             sections_html += flush_contacts()
             rule = '<div class="section-rule"></div>' if is_tech else ''
-            sections_html += f'<div class="section-title">{stripped}</div>{rule}'
-            current_section = stripped
+            sections_html += f'<div class="section-title">{hdr_title}</div>{rule}'
+            current_section = hdr_title
             continue
 
         # Name (first short non-contact line)
-        if in_header_block and not name_done and len(stripped.split()) <= 6 and not any(c in stripped for c in ["@",":","|","+"]):
-            name_display = stripped
-            if is_tech:
-                # Split name and add accent to last word
-                parts = stripped.split()
-                if len(parts) > 1:
-                    name_display = " ".join(parts[:-1]) + f' <span class="name-accent">{parts[-1]}</span>'
-            sections_html += f'<div class="name">{name_display}</div>'
-            name_done = True
-            continue
+        if in_header_block and not name_done:
+            name_candidate = strip_markdown(stripped).strip()
+            if len(name_candidate.split()) <= 6 and not any(c in name_candidate for c in ["@", ":", "|", "+"]):
+                name_display = name_candidate
+                if is_tech:
+                    # Split name and add accent to last word
+                    parts = name_candidate.split()
+                    if len(parts) > 1:
+                        name_display = " ".join(parts[:-1]) + f' <span class="name-accent">{parts[-1]}</span>'
+                sections_html += f'<div class="name">{name_display}</div>'
+                name_done = True
+                continue
 
         # Contact info lines
         if in_header_block:
@@ -178,31 +245,36 @@ def _parse_resume_to_html(text: str, template_name: str) -> str:
             continue
 
         # Bullet point
-        if stripped.startswith("•") or stripped.startswith("-"):
-            clean = stripped.lstrip("•- ").strip()
-            sections_html += f'<div class="bullet">{clean}</div>'
+        if is_bullet(stripped):
+            clean = clean_bullet_text(stripped)
+            sections_html += f'<div class="bullet">{md_to_html(clean)}</div>'
             continue
 
         # Job header: line with | separating company/title/date
         if "|" in stripped and len(stripped.split("|")) >= 2:
             parts = [p.strip() for p in stripped.split("|")]
-            sections_html += f'<div class="job-header">{parts[0]}</div>'
+            company = md_to_html(strip_markdown(parts[0]))
+            sections_html += f'<div class="job-header">{company}</div>'
             if len(parts) > 1:
-                sections_html += f'<div class="job-meta">{" · ".join(parts[1:])}</div>'
+                meta = " · ".join(md_to_html(strip_markdown(p)) for p in parts[1:])
+                sections_html += f'<div class="job-meta">{meta}</div>'
             continue
 
         # Date ranges as job meta
         if re.search(r'\d{4}', stripped) and ("–" in stripped or "-" in stripped or "Present" in stripped) and len(stripped) < 60:
-            sections_html += f'<div class="job-meta">{stripped}</div>'
+            sections_html += f'<div class="job-meta">{md_to_html(strip_markdown(stripped))}</div>'
             continue
 
         # Skills line with colon
         if ":" in stripped and current_section and "SKILL" in current_section.upper():
-            sections_html += f'<div class="skill-group"><strong>{stripped.split(":")[0]}:</strong> {":".join(stripped.split(":")[1:])}</div>'
+            parts = stripped.split(":")
+            category = md_to_html(strip_markdown(parts[0]))
+            val = md_to_html(strip_markdown(":".join(parts[1:])))
+            sections_html += f'<div class="skill-group"><strong>{category}:</strong> {val}</div>'
             continue
 
         # Generic body text
-        sections_html += f'<div class="body-text">{stripped}</div>'
+        sections_html += f'<div class="body-text">{md_to_html(stripped)}</div>'
 
     sections_html += flush_contacts()
 
@@ -275,24 +347,31 @@ def render_optimized_resume():
     </div>
     """, unsafe_allow_html=True)
 
-    cols = st.columns(5, gap="small")
-    for i, (tname, tmeta) in enumerate(TEMPLATES.items()):
-        with cols[i]:
-            selected = st.session_state.get("selected_template") == tname
-            border   = "2px solid #c9a96e" if selected else "1px solid rgba(201,169,110,0.15)"
-            bg       = "rgba(201,169,110,0.08)" if selected else "#12121a"
-            st.markdown(f"""
-            <div style="background:{bg};border:{border};border-radius:10px;
-                        padding:0.8rem 0.5rem;text-align:center;cursor:pointer">
-                <div style="font-size:1.4rem;margin-bottom:0.3rem">{tmeta['icon']}</div>
-                <div style="font-size:0.72rem;font-weight:600;color:#f0f2f6;
-                            margin-bottom:0.2rem">{tname}</div>
-                <div style="font-size:0.62rem;color:#6b7589;line-height:1.4">{tmeta['desc']}</div>
-            </div>
-            """, unsafe_allow_html=True)
-            if st.button("Select", key=f"tpl_{i}", use_container_width=True):
-                st.session_state.selected_template = tname
-                st.rerun()
+    t_items = list(TEMPLATES.items())
+    for row_idx in [0, 4]:
+        cols = st.columns(4, gap="small")
+        for col_idx in range(4):
+            idx = row_idx + col_idx
+            if idx >= len(t_items):
+                break
+            tname, tmeta = t_items[idx]
+            with cols[col_idx]:
+                selected = st.session_state.get("selected_template") == tname
+                border   = "2px solid #c9a96e" if selected else "1px solid rgba(201,169,110,0.15)"
+                bg       = "rgba(201,169,110,0.08)" if selected else "#12121a"
+                st.markdown(f"""
+                <div style="background:{bg};border:{border};border-radius:10px;
+                            padding:0.6rem 0.4rem;text-align:center;cursor:pointer;min-height:115px">
+                    <div style="font-size:1.2rem;margin-bottom:0.2rem">{tmeta['icon']}</div>
+                    <div style="font-size:0.68rem;font-weight:600;color:#f0f2f6;
+                                margin-bottom:0.2rem">{tname}</div>
+                    <div style="font-size:0.58rem;color:#6b7589;line-height:1.3">{tmeta['desc']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                if st.button("Select", key=f"tpl_{idx}", use_container_width=True):
+                    st.session_state.selected_template = tname
+                    st.rerun()
+        st.markdown("<div style='margin-bottom:0.4rem'></div>", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 

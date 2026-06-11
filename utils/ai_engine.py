@@ -80,6 +80,7 @@ RULES:
 10. Skills should be grouped by category: Programming Languages: ..., Frameworks: ..., Tools: ...
 11. Write a 3-4 sentence professional summary tailored to this specific role.
 12. Optimize for ATS: no tables, no columns, no graphics.
+13. CRITICAL SINGLE-PAGE CONSTRAINT: The optimized resume MUST fit on a single page. Keep the content extremely high-impact, tight, and concise. Avoid wordiness. Limit each job to a maximum of 3-4 highly relevant bullet points, and keep the professional summary to 2-3 sentences.
 
 Output ONLY the resume text — no preamble, no explanation, no markdown."""
 
@@ -129,7 +130,15 @@ def _call_ai(provider: str, api_key: str, prompt: str) -> str:
 def analyze_resume(resume_text: str, jd_text: str, provider: str, api_key: str) -> dict:
     prompt = ANALYSIS_PROMPT.format(resume=resume_text, jd=jd_text)
     raw = _call_ai(provider, api_key, prompt)
-    clean = re.sub(r"```(?:json)?|```", "", raw).strip()
+    
+    # Extract only the JSON object boundaries to ignore conversational wrappers
+    start_idx = raw.find("{")
+    end_idx = raw.rfind("}")
+    if start_idx != -1 and end_idx != -1:
+        clean = raw[start_idx:end_idx+1].strip()
+    else:
+        clean = re.sub(r"```(?:json)?|```", "", raw).strip()
+        
     try:
         return json.loads(clean)
     except json.JSONDecodeError as e:

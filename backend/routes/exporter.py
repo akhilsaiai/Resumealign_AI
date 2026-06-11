@@ -18,7 +18,7 @@ class ExportRequest(BaseModel):
 class PDFExportRequest(ExportRequest):
     template_name: str = Field(
         "Classic Professional", 
-        description="The template style to use. Choices: 'Classic Professional', 'Modern Minimal', 'Executive Elite', 'Tech Focused', 'Creative Clean'"
+        description="The template style to use. Choices: 'Classic Professional', 'Modern Minimal', 'Executive Elite', 'Tech Focused', 'Creative Clean', 'Sleek Harvard', 'Silicon Valley', 'Corporate Executive'"
     )
 
 @router.post("/docx")

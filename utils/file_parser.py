@@ -10,6 +10,7 @@ def extract_text_from_pdf(uploaded_file) -> str:
     """Extract plain text from a PDF file object."""
     try:
         import PyPDF2
+        uploaded_file.seek(0)
         reader = PyPDF2.PdfReader(io.BytesIO(uploaded_file.read()))
         pages = [page.extract_text() or "" for page in reader.pages]
         return "\n".join(pages).strip()
@@ -17,6 +18,7 @@ def extract_text_from_pdf(uploaded_file) -> str:
         # Fallback to pypdf if PyPDF2 not installed
         try:
             import pypdf
+            uploaded_file.seek(0)
             reader = pypdf.PdfReader(io.BytesIO(uploaded_file.read()))
             pages = [page.extract_text() or "" for page in reader.pages]
             return "\n".join(pages).strip()
@@ -31,6 +33,7 @@ def extract_text_from_docx(uploaded_file) -> str:
     """Extract plain text from a .docx file object."""
     try:
         import docx
+        uploaded_file.seek(0)
         doc = docx.Document(io.BytesIO(uploaded_file.read()))
         paragraphs = [para.text for para in doc.paragraphs if para.text.strip()]
         return "\n".join(paragraphs).strip()
@@ -56,6 +59,7 @@ def parse_uploaded_file(uploaded_file) -> str:
     elif name.endswith(".docx"):
         return extract_text_from_docx(uploaded_file)
     elif name.endswith(".txt"):
+        uploaded_file.seek(0)
         return uploaded_file.read().decode("utf-8", errors="ignore").strip()
     else:
         raise ValueError(

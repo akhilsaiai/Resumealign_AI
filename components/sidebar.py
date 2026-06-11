@@ -21,22 +21,33 @@ def render_sidebar():
 
         provider = st.selectbox("AI Provider", ["Groq (Free)", "OpenAI GPT-4o"], index=0, key="model_provider")
 
-        env_key = os.getenv("GROQ_API_KEY","") if provider == "Groq (Free)" else os.getenv("OPENAI_API_KEY","")
+        key_name = "GROQ_API_KEY" if provider == "Groq (Free)" else "OPENAI_API_KEY"
+        env_key = os.getenv(key_name, "")
+        if not env_key:
+            try:
+                if key_name in st.secrets:
+                    env_key = st.secrets[key_name]
+            except Exception:
+                pass
 
         if env_key:
             st.markdown("""
             <div style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0.9rem;
                         background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);
                         border-radius:8px;font-size:0.78rem;color:#4ade80;margin:0.5rem 0">
-                🔑 &nbsp; API key loaded automatically
+                🔑 &nbsp; API key loaded securely
             </div>
             """, unsafe_allow_html=True)
             st.session_state.api_key = env_key
         else:
-            label = "Groq API Key" if provider == "Groq (Free)" else "OpenAI API Key"
-            hint  = "Free at console.groq.com" if provider == "Groq (Free)" else "platform.openai.com"
-            st.text_input(label, type="password", placeholder="Paste API key…", help=hint, key="api_key")
-            st.caption("💡 Add to `.env` to skip this every time.")
+            st.markdown(f"""
+            <div style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0.9rem;
+                        background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
+                        border-radius:8px;font-size:0.78rem;color:#f87171;margin:0.5rem 0">
+                ⚠️ &nbsp; {key_name} missing from secrets/env!
+            </div>
+            """, unsafe_allow_html=True)
+            st.session_state.api_key = ""
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<div style='font-size:0.7rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#c9a96e;margin-bottom:0.6rem'>📋 &nbsp; How it works</div>", unsafe_allow_html=True)
