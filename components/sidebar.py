@@ -17,11 +17,7 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("<div style='font-size:0.7rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#c9a96e;margin-bottom:0.6rem'>⚙️ &nbsp; Configuration</div>", unsafe_allow_html=True)
-
-        provider = st.selectbox("AI Provider", ["Groq (Free)", "OpenAI GPT-4o"], index=0, key="model_provider")
-
-        key_name = "GROQ_API_KEY" if provider == "Groq (Free)" else "OPENAI_API_KEY"
+        key_name = "GROQ_API_KEY"
         env_key = os.getenv(key_name, "")
         if not env_key:
             try:
@@ -29,25 +25,7 @@ def render_sidebar():
                     env_key = st.secrets[key_name]
             except Exception:
                 pass
-
-        if env_key:
-            st.markdown("""
-            <div style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0.9rem;
-                        background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);
-                        border-radius:8px;font-size:0.78rem;color:#4ade80;margin:0.5rem 0">
-                🔑 &nbsp; API key loaded securely
-            </div>
-            """, unsafe_allow_html=True)
-            st.session_state.api_key = env_key
-        else:
-            st.markdown(f"""
-            <div style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0.9rem;
-                        background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
-                        border-radius:8px;font-size:0.78rem;color:#f87171;margin:0.5rem 0">
-                ⚠️ &nbsp; {key_name} missing from secrets/env!
-            </div>
-            """, unsafe_allow_html=True)
-            st.session_state.api_key = ""
+        st.session_state.api_key = env_key
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<div style='font-size:0.7rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#c9a96e;margin-bottom:0.6rem'>📋 &nbsp; How it works</div>", unsafe_allow_html=True)
@@ -74,9 +52,12 @@ def render_sidebar():
                 st.rerun()
 
         st.markdown("""
-        <div style="margin-top:2rem;font-size:0.68rem;color:#6b7589;text-align:center;line-height:1.7;
-                    border-top:1px solid rgba(201,169,110,0.1);padding-top:1rem">
-            Powered by Groq · Llama 3.3 70B<br>
-            <span style="color:#c9a96e">ResumeAlign AI</span> &nbsp;·&nbsp; v2.0
+        <div style="margin-top:2rem;text-align:center;padding-top:1.5rem;border-top:1px solid rgba(201,169,110,0.1)">
+            <div style="font-size:0.65rem;color:#6b7589;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.3rem">
+                Intelligent Engine
+            </div>
+            <div style="font-size:0.8rem;color:#f0f2f6;font-family:'Playfair Display', serif;font-style:italic">
+                Designed by <span style="color:#c9a96e;font-weight:600;font-style:normal">Akhil</span>
+            </div>
         </div>
         """, unsafe_allow_html=True)

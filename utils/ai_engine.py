@@ -63,24 +63,27 @@ IDENTIFIED MISSING SKILLS TO INCORPORATE (only if genuinely applicable):
 
 RULES:
 1. CRITICAL: Preserve the candidate's REAL name, contact details, job titles, company names, and dates exactly as they appear in the original resume. Do NOT invent or change any personal information.
-2. Use strong action verbs and quantify achievements wherever possible.
-3. Naturally incorporate missing keywords from the JD only if relevant to actual experience.
-4. Structure sections in this order:
+2. CRITICAL PRESERVATION: You MUST keep ALL Projects, Internships, and Work Experiences from the original resume. DO NOT DELETE or summarize away any project or experience section. 
+3. Use strong action verbs and quantify achievements wherever possible.
+4. Naturally incorporate missing keywords from the JD only if relevant to actual experience.
+5. Structure sections in this logical order (if present in original):
    CONTACT INFORMATION
    PROFESSIONAL SUMMARY
    TECHNICAL SKILLS
    WORK EXPERIENCE
+   INTERNSHIPS (if present)
+   PROJECTS (if present)
    EDUCATION
-   CERTIFICATIONS (only if present in original)
-5. Each section header must be on its own line in ALL CAPS followed by a blank line.
-6. For each job: Company Name | Job Title | Start Date - End Date on one line, then bullet points.
-7. Use • for bullet points. Each bullet on its own line.
-8. Keep contact info on separate lines: Name, then Email, then Phone, then Location, then LinkedIn.
-9. Do NOT put multiple pieces of information on the same line unless they are the same field.
-10. Skills should be grouped by category: Programming Languages: ..., Frameworks: ..., Tools: ...
-11. Write a 3-4 sentence professional summary tailored to this specific role.
-12. Optimize for ATS: no tables, no columns, no graphics.
-13. CRITICAL SINGLE-PAGE CONSTRAINT: The optimized resume MUST fit on a single page. Keep the content extremely high-impact, tight, and concise. Avoid wordiness. Limit each job to a maximum of 3-4 highly relevant bullet points, and keep the professional summary to 2-3 sentences.
+   CERTIFICATIONS (if present)
+6. Each section header must be on its own line in ALL CAPS followed by a blank line.
+7. For each job/project: Company Name | Job Title | Start Date - End Date on one line, then bullet points.
+8. Use • for bullet points. Each bullet on its own line.
+9. Keep contact info on separate lines: Name, then Email, then Phone, then Location, then LinkedIn.
+10. Do NOT put multiple pieces of information on the same line unless they are the same field.
+11. Skills should be grouped by category: Programming Languages: ..., Frameworks: ..., Tools: ...
+12. Write a 3-4 sentence professional summary tailored to this specific role.
+13. Optimize for ATS: no tables, no columns, no graphics.
+14. ADAPTIVE LENGTH: If the resume is short, expand on bullet points to fill the page beautifully without excessive white space. If the resume is long, keep it concise and high-impact to fit on a single page. 
 
 Output ONLY the resume text — no preamble, no explanation, no markdown."""
 
