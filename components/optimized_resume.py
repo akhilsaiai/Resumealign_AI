@@ -170,7 +170,6 @@ TEMPLATES = {
             .skill-group{font-size:10px;color:#334155;margin:2px 0;line-height:1.4}
         """,
     },
-},
 }
 
 
